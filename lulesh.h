@@ -13,7 +13,7 @@
    SEDOV_SYNC_POS_VEL_LATE
 */
 
-#define SEDOV_SYNC_POS_VEL_EARLY 1
+#define SEDOV_SYNC_POS_VEL_LATE 1
 #endif
 
 #include <math.h>
