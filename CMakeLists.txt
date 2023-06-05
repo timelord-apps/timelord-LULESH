@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 project(LULESH CXX)
 
 option(WITH_MPI    "Build LULESH with MPI"          TRUE)
-option(WITH_OPENMP "Build LULESH with OpenMP"       TRUE)
+option(WITH_OPENMP "Build LULESH with OpenMP"       FALSE)
 option(WITH_SILO   "Build LULESH with silo support" FALSE)
 
 if (WITH_MPI)
@@ -53,3 +53,5 @@ set(LULESH_EXEC lulesh2.0)
 
 add_executable(${LULESH_EXEC} ${LULESH_SOURCES})
 target_link_libraries(${LULESH_EXEC} ${LULESH_EXTERNAL_LIBS})
+
+add_executable(ew idle_ew.cc)

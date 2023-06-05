@@ -154,6 +154,10 @@ Additional BSD Notice
 #include <sys/time.h>
 #include <iostream>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sched.h>
+#include <fstream>
 
 #if _OPENMP
 # include <omp.h>
@@ -2654,6 +2658,7 @@ int main(int argc, char *argv[])
    int myRank ;
    struct cmdLineOpts opts;
 
+
 #if USE_MPI   
    Domain_member fieldData ;
    
@@ -2673,6 +2678,36 @@ int main(int argc, char *argv[])
     
    MPI_Comm_size(MPI_COMM_WORLD, &numRanks) ;
    MPI_Comm_rank(MPI_COMM_WORLD, &myRank) ;
+   #define ENABLE_EW true
+   
+   #if ENABLE_EW
+      int num_processes = numRanks;
+
+      // Fork the process.
+      std::cout << "Forking " << num_processes << " processes\n";
+      
+      pid_t parent_pid = getpid();
+      std::cout << "Parent's PID in the parent process: " << parent_pid << std::endl;
+
+      pid_t* pids = new pid_t[num_processes];
+      pid_t pid;  
+      pid = fork();
+      if(pid == -1){
+         std::cout << "Error forking process\n";
+         exit(1);
+      }
+      if (pid == 0) {
+         // std::cout << "Forking process\n";
+         execl("./ew", "ew" , NULL);
+         // Break out of the loop so that each process only runs on one CPU.
+         std::cout << "Failed to execute child process\n";
+         MPI_Abort(MPI_COMM_WORLD, 1);
+
+      }
+      else if(pid != 0){
+         pids[myRank] = pid;  
+      }
+   #endif
 #else
    numRanks = 1;
    myRank = 0;
@@ -2788,5 +2823,21 @@ int main(int argc, char *argv[])
    MPI_Finalize() ;
 #endif
 
+   #if ENABLE_EW
+      #if USE_MPI
+         for (int i = 0; i < num_processes; i++) {
+            int killResult = kill(pids[i], SIGTERM);
+            if (killResult == 0) {
+                  std::cout << "EW Process "<< i <<" terminated successfully." << std::endl;
+            }
+            else {
+                  std::cerr << "Failed to terminate process: " << i <<std::endl;
+            }
+         }
+         for (int i = 0; i < num_processes; i++) {
+            waitpid(pids[i], NULL, 0);
+         }
+      #endif
+   #endif
    return 0 ;
 }
