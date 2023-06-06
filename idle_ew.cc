@@ -4,7 +4,7 @@
 #include <csignal>
 #include <fstream>
 #include <string>
-
+#include <iomanip>
 
 //Variables for random number calculations
 unsigned int seed = 123;  // Initial seed value
@@ -15,7 +15,7 @@ unsigned int m = 2147483648;  // Modulus
 //Iteration counts
 unsigned long long int iterations = 0;
 
-std::string filename = "output.txt";
+std::string filename = "output_" + std::to_string(getpid()) + ".txt";
 
 //Function to handle the termination signal
 void signalHandler(int signal) {
@@ -24,7 +24,8 @@ void signalHandler(int signal) {
         std::cout << "\nReceived termination signal" << std::endl;
         file << "The Random Value is " << seed << std::endl;
         file << "Total Iterations: " << iterations << std::endl;
-        std::cout << "Total Iterations: " << iterations << std::endl;
+        //cout total iterations with scientific notation with e
+        std::cout << "Total Iterations: " << std::scientific << std::setprecision(8) << iterations << std::endl;
         file.close(); // Close the file
     }
     else {
@@ -79,7 +80,7 @@ int main() {
         return 1;
     }
     
-    // std::cout << "Started Calcs" << std::endl;
+    std::cout << "Started Calcs" << std::endl;
     //Begin extra work
     while(true) {
         lcg();

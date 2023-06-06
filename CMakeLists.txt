@@ -55,3 +55,4 @@ add_executable(${LULESH_EXEC} ${LULESH_SOURCES})
 target_link_libraries(${LULESH_EXEC} ${LULESH_EXTERNAL_LIBS})
 
 add_executable(ew idle_ew.cc)
+set_target_properties(ew PROPERTIES COMPILE_FLAGS "-O0")
