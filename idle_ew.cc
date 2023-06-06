@@ -7,7 +7,6 @@
 #include <iomanip>
 #include <unistd.h>
 
-
 //Variables for random number calculations
 unsigned int seed = 123;  // Initial seed value
 unsigned int a = 1103515245;  // Multiplier
