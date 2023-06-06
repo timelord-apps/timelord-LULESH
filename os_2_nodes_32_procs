@@ -16,7 +16,7 @@ export OMP_NUM_THREADS = 32
 export I_MPI_PIN_PROCESSOR_LIST=allcores
 for ((iter=1; iter<=$max_iter; iter=iter+1))
 do
-    ibrun ./lulesh -s 30 -p -i 500 > $data/lulesh_"${iter}"_${SLURM_NTASKS}_small.txt
+    ibrun ./lulesh -s 30 -p -i 500 > $data/lulesh_os_"${iter}"_${SLURM_NTASKS}_small.txt
 done
 
 
