@@ -643,3 +643,64 @@ void CommMonoQ(Domain& domain);
 // lulesh-init
 void InitMeshDecomp(Int_t numRanks, Int_t myRank,
                     Int_t *col, Int_t *row, Int_t *plane, Int_t *side);
+
+
+
+struct proc_info
+{
+    double start_time, interval, max_time, expected_superstep_duration;
+    int rank, size;
+    void* scratch;
+
+};
+
+extern struct proc_info* pstruct_p;
+
+void setup_timelord();
+void try_extrawork();
+void finish_extrawork();
+
+
+void setup_extrawork();
+void do_extrawork();
+void cleanup_extrawork();
+int can_do_extrawork();
+void timelord_stat();
+
+unsigned int lcg();
+
+
+extern int stage;
+
+struct PREDICTOR {
+   double slope, intercept, dx, dy, mu_x, mu_y, var_x, cov_xy, n;
+
+   PREDICTOR() : slope(0), intercept(0), dx(0), dy(0), mu_x(0), mu_y(0), var_x(0), cov_xy(0), n(0) {}
+
+   void regress(double x, double y){
+      n++;
+      dx = x - mu_x;
+      dy = y - mu_y;
+
+      var_x += (((n-1)/n) *dx*dx - var_x)/n;
+      cov_xy += (((n-1)/n)*dx*dy - cov_xy)/n;
+
+      mu_x += (dx/n);
+      mu_y += (dy/n);
+
+      if(var_x > 0){
+         slope = cov_xy / var_x;
+         intercept= mu_y - slope * mu_x;
+      }else{
+         slope = 0;
+         intercept = 0;
+      }
+   }
+
+   inline double predict(double x){
+      return slope * x + intercept;
+   }
+};
+
+extern struct PREDICTOR* predictor;
+

@@ -47,6 +47,7 @@ set(LULESH_SOURCES
   lulesh-init.cc
   lulesh-util.cc
   lulesh-viz.cc
+  timelord.cc
   lulesh.cc)
 
 set(LULESH_EXEC lulesh2.0)

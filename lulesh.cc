@@ -2600,6 +2600,7 @@ void CalcTimeConstraintsForElems(Domain& domain) {
 static inline
 void LagrangeLeapFrog(Domain& domain)
 {
+   pstruct_p->start_time = MPI_Wtime();
 #ifdef SEDOV_SYNC_POS_VEL_LATE
    Domain_member fieldData[6] ;
 #endif
@@ -2639,6 +2640,12 @@ void LagrangeLeapFrog(Domain& domain)
 
 #if USE_MPI   
 #ifdef SEDOV_SYNC_POS_VEL_LATE
+   /*Timelord Annotation */
+   pstruct_p->interval = MPI_Wtime() - pstruct_p->start_time;
+   pstruct_p->expected_superstep_duration = predictor->predict(pstruct_p->interval);
+   MPI_Allreduce(&pstruct_p->interval, &pstruct_p->max_time, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+   predictor->regress(pstruct_p->interval, pstruct_p->max_time);
+   try_extrawork();
    CommSyncPosVel(domain) ;
 #endif
 #endif   
@@ -2671,8 +2678,17 @@ int main(int argc, char *argv[])
    MPI_Init(&argc, &argv);
 #endif
     
+   struct proc_info p;
+   struct PREDICTOR pred;
+   pstruct_p = &p;
+   predictor = &pred;
+   pstruct_p->rank = numRanks;
+   pstruct_p->size = myRank;
+
    MPI_Comm_size(MPI_COMM_WORLD, &numRanks) ;
    MPI_Comm_rank(MPI_COMM_WORLD, &myRank) ;
+   setup_timelord();
+
 #else
    numRanks = 1;
    myRank = 0;
@@ -2744,6 +2760,7 @@ int main(int argc, char *argv[])
 //      std::cout << "region" << i + 1<< "size" << locDom->regElemSize(i) <<std::endl;
    while((locDom->time() < locDom->stoptime()) && (locDom->cycle() < opts.its)) {
 
+
       TimeIncrement(*locDom) ;
       LagrangeLeapFrog(*locDom) ;
 
@@ -2783,6 +2800,9 @@ int main(int argc, char *argv[])
    }
 
    delete locDom; 
+
+   finish_extrawork();
+   MPI_Barrier(MPI_COMM_WORLD);
 
 #if USE_MPI
    MPI_Finalize() ;
