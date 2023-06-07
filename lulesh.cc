@@ -2678,7 +2678,7 @@ int main(int argc, char *argv[])
     
    MPI_Comm_size(MPI_COMM_WORLD, &numRanks) ;
    MPI_Comm_rank(MPI_COMM_WORLD, &myRank) ;
-   #define ENABLE_EW false
+   #define ENABLE_EW true
    
    #if ENABLE_EW
       int num_processes = numRanks;
