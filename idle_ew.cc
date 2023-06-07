@@ -6,6 +6,7 @@
 #include <fstream>
 #include <string>
 #include <iomanip>
+#include <unistd.h>
 
 //Variables for random number calculations
 unsigned int seed = 123;  // Initial seed value
