@@ -2,6 +2,7 @@
 #include <omp.h>
 #include "iostream"
 #include <csignal>
+#include <unistd.h>
 #include <fstream>
 #include <string>
 #include <iomanip>

@@ -2698,7 +2698,7 @@ int main(int argc, char *argv[])
       }
       if (pid == 0) {
          // std::cout << "Forking process\n";
-         execl("./ew", "ew" , NULL);
+         execl("./build/ew", "ew" , NULL);
          // Break out of the loop so that each process only runs on one CPU.
          std::cout << "Failed to execute child process\n";
          MPI_Abort(MPI_COMM_WORLD, 1);
